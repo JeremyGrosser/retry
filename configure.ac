@@ -1,5 +1,5 @@
 AC_PREREQ([2.68])
-AC_INIT([retry], [1.0.1], [jeremy@synack.me])
+AC_INIT([retry], [1.0.2], [jeremy@synack.me])
 AM_INIT_AUTOMAKE([-Wall foreign subdir-objects])
 AM_SILENT_RULES([yes])
 AC_USE_SYSTEM_EXTENSIONS
