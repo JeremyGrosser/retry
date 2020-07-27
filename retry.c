@@ -134,7 +134,6 @@ int main(int argc, char *argv[]) {
             fprintf(stderr, "Attempt %d/%d exited with status: %d, retrying after %.03f seconds\n", attempts, num_retries, ret, backoff);
             dsleep(backoff);
             backoff = backoff * 2.0;
-            printf("backoff=%f max_backoff=%f\n", backoff, max_backoff);
             if(max_backoff > 0.0 && backoff > max_backoff) {
                 backoff = max_backoff;
             }
