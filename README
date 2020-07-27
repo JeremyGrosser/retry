@@ -6,12 +6,12 @@ GPL-2.0 license. See COPYING for details.
 Usage
 =====
 
-    retry -h -n NUM_RETRIES -b BACKOFF -s RETURN_CODE <command>
-        -h this help
+    retry -h -n NUM_RETRIES -b BACKOFF -m MAX_BACKOFF -s RETURN_CODE <command>
         -n number of retries to attempt if the command returns nonzero (default: 10)
         -b initial backoff in seconds. Each subsequent failure will double the backoff interval (default: 1.0)
         -m maximum backoff in seconds. (default: unlimited)
         -s return value indicating success of the command. May be used more than once. (default: 0)
+        -h this help
 
 Building
 ========
