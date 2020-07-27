@@ -27,7 +27,7 @@
 
 void help() {
     fprintf(stderr, "retry -h -n NUM_RETRIES -b BACKOFF -m MAX_BACKOFF -s RETURN_CODE <command>\n");
-    fprintf(stderr, "    -n number of retries to attempt if the command returns nonzero (default: 10)\n");
+    fprintf(stderr, "    -n number of retries to attempt if the command does not return successfully (default: 10)\n");
     fprintf(stderr, "    -b initial backoff in seconds. Each subsequent failure will double the backoff interval (default: 1.0)\n");
     fprintf(stderr, "    -m maximum backoff in seconds. (default: unlimited)\n");
     fprintf(stderr, "    -s return value indicating success of the command. May be used more than once. (default: 0)\n");
