@@ -131,12 +131,12 @@ int main(int argc, char *argv[]) {
         }
 
         if(attempts < num_retries) {
-            fprintf(stderr, "Attempt %d/%d exited with status: %d, retrying after %.03f seconds\n", attempts, num_retries, ret, backoff);
-            dsleep(backoff);
-            backoff = backoff * 2.0;
             if(max_backoff > 0.0 && backoff > max_backoff) {
                 backoff = max_backoff;
             }
+            fprintf(stderr, "Attempt %d/%d exited with status: %d, retrying after %.03f seconds\n", attempts, num_retries, ret, backoff);
+            dsleep(backoff);
+            backoff = backoff * 2.0;
         }else{
             fprintf(stderr, "Attempt %d/%d exited with status: %d, no more retries\n", attempts, num_retries, ret);
             return ret;
