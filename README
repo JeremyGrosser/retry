@@ -16,7 +16,7 @@ Usage
 Building
 ========
 
-    autoreconf -i .
+    ./bootstrap
     ./configure
     make
     make install
