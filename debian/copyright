@@ -1,5 +1,5 @@
 Format: https://www.debian.org/doc/packaging-manuals/copyright-format/1.0/
-Upstream-Name: retry
+Upstream-Name: jtgretry
 Upstream-Contact: Jeremy Grosser <jeremy@synack.me>
 Source: https://github.com/JeremyGrosser/retry
 
