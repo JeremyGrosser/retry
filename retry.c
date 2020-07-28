@@ -25,7 +25,7 @@
 
 #define MAX_SUCCESS_CODES 16
 
-void help() {
+static void help() {
     fprintf(stderr, "retry -h -n NUM_RETRIES -b BACKOFF -m MAX_BACKOFF -s RETURN_CODE <command>\n");
     fprintf(stderr, "    -n number of retries to attempt if the command does not return successfully (default: 10)\n");
     fprintf(stderr, "    -b initial backoff in seconds. Each subsequent failure will double the backoff interval (default: 1.0)\n");
@@ -34,7 +34,7 @@ void help() {
     fprintf(stderr, "    -h this help\n");
 }
 
-void dsleep(double seconds) {
+static void dsleep(double seconds) {
     struct timespec ts;
     long ns = (long)(seconds * 1000000.0);
     ts.tv_sec = (time_t)(ns / 1000000);
@@ -43,8 +43,8 @@ void dsleep(double seconds) {
 }
 
 int main(int argc, char *argv[]) {
-    int num_retries = 10;
-    int attempts = 0;
+    long int num_retries = 10;
+    long int attempts = 0;
     double backoff = 1.0;
     double max_backoff = 0.0;
     int sc[MAX_SUCCESS_CODES] = {0};
@@ -61,7 +61,7 @@ int main(int argc, char *argv[]) {
                 return 0;
                 break;
             case 'n':
-                num_retries = strtoul(optarg, NULL, 0);
+                num_retries = strtol(optarg, NULL, 0);
                 if(num_retries <= 0) {
                     fprintf(stderr, "Number of retries must be > 0\n");
                     return -1;
@@ -86,7 +86,7 @@ int main(int argc, char *argv[]) {
                     fprintf(stderr, "Too many success codes (-s) specified!\n");
                     return -1;
                 }
-                sc[sc_idx++] = strtoul(optarg, NULL, 0);
+                sc[sc_idx++] = (int)strtol(optarg, NULL, 0);
                 break;
             default:
                 help();
@@ -134,11 +134,11 @@ int main(int argc, char *argv[]) {
             if(max_backoff > 0.0 && backoff > max_backoff) {
                 backoff = max_backoff;
             }
-            fprintf(stderr, "Attempt %d/%d exited with status: %d, retrying after %.03f seconds\n", attempts, num_retries, ret, backoff);
+            fprintf(stderr, "Attempt %ld/%ld exited with status: %d, retrying after %.03f seconds\n", attempts, num_retries, ret, backoff);
             dsleep(backoff);
             backoff = backoff * 2.0;
         }else{
-            fprintf(stderr, "Attempt %d/%d exited with status: %d, no more retries\n", attempts, num_retries, ret);
+            fprintf(stderr, "Attempt %ld/%ld exited with status: %d, no more retries\n", attempts, num_retries, ret);
             return ret;
         }
 
