@@ -1,0 +1,13 @@
+Source: retry
+Section: utils
+Priority: optional
+Maintainer: Jeremy Grosser <jeremy@synack.me>
+Build-Depends: debhelper-compat (= 12)
+Standards-Version: 4.5.0
+Vcs-Browser: https://github.com/JeremyGrosser/retry
+Vcs-Git: https://github.com/JeremyGrosser/retry.git
+
+Package: retry
+Architecture: any
+Depends: ${shlibs:Depends}, ${misc:Depends}
+Description: run a command until it succeeds
