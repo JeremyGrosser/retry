@@ -7,16 +7,23 @@ Usage
 =====
 
     retry -h -n NUM_RETRIES -b BACKOFF -m MAX_BACKOFF -s RETURN_CODE <command>
-        -n number of retries to attempt if the command does not return successfully (default: 10)
-        -b initial backoff in seconds. Each subsequent failure will double the backoff interval (default: 1.0)
-        -m maximum backoff in seconds. (default: unlimited)
-        -s return value indicating success of the command. May be used more than once. (default: 0)
-        -h this help
+          
+          -n number of retries to attempt if the command does not return successfully.
+             default: unlimited
+          -b initial backoff in seconds. Each subsequent failure will double the backoff interval.
+             default: 1.000
+          -m maximum backoff in seconds.
+             default: unlimited
+          -s return value indicating success of the command. May be used up to 16 times.
+             default: 0
+          -h this help
+          
+          backoff values have a resolution of 1 millisecond (0.001 seconds)
+          return codes must be in the range 0 .. 255
+          command is executed in a subshell: /bin/sh -c "<command>"
 
 Building
 ========
 
-    ./bootstrap
-    ./configure
     make
     make install
