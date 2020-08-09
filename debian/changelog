@@ -1,3 +1,9 @@
+jtgretry (2.0.0-1) unstable; urgency=medium
+
+  * New upstream release 
+
+ -- Jeremy Grosser <jeremy@synack.me>  Sun, 09 Aug 2020 14:46:17 -0700
+
 jtgretry (1.0.6-1) unstable; urgency=medium
 
   * Initial release
