@@ -143,9 +143,14 @@ begin
                 Seconds_IO.Put (Standard_Error, Backoff);
                 Put_Line (Standard_Error, " seconds");
 
-                Next_Retry := Clock + Milliseconds (Integer (Backoff * 1_000.0));
+                Next_Retry := Clock + Milliseconds (Integer (Float (Backoff) * 1_000.0));
                 delay until Next_Retry;
 
+                if (Backoff * 2.0) > Seconds'Last then
+                    Put_Line (Standard_Error, "Backoff exceeds limit, exit.");
+                    Set_Exit_Status (-1);
+                    return;
+                end if;
                 Backoff := Backoff * 2.0;
             end if;
         end loop;
