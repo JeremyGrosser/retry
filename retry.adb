@@ -26,6 +26,23 @@ with Ada.Text_IO; use Ada.Text_IO;
 with Ada.Exceptions;
 
 procedure Retry is
+    subtype Return_Code is Integer range 0 .. 255;
+    type Success_Codes is array (1 .. 16) of Return_Code;
+    subtype Seconds is Float range 0.0 .. (Float (Integer'Last) / 1000.0);
+
+    package Seconds_IO is new Ada.Text_IO.Float_IO
+        (Num => Seconds);
+    package Integer_IO is new Ada.Text_IO.Integer_IO
+        (Num => Integer);
+
+    Num_Retries : Natural   := 0;
+    Attempts    : Natural   := 0;
+    Backoff     : Seconds   := 1.0;
+    Max_Backoff : Seconds   := 0.0;
+    SC_Index    : Positive  := Success_Codes'First;
+    SC          : Success_Codes := (others => 0);
+    Last        : Positive;
+
     procedure Help is
     begin
         Put_Line (Standard_Error, "retry -h -n NUM_RETRIES -b BACKOFF -m MAX_BACKOFF -s RETURN_CODE <command>");
@@ -40,43 +57,27 @@ procedure Retry is
         Put_Line (Standard_Error, "         default: 0");
         Put_Line (Standard_Error, "      -h this help");
         Put_Line (Standard_Error, "      ");
-        Put_Line (Standard_Error, "      backoff values have a resolution of 1 millisecond (0.001 seconds)");
+        Put_Line (Standard_Error, "      backoff values have a resolution of 1 millisecond (0.001 seconds), ");
+        Put      (Standard_Error, "      up to ");
+        Seconds_IO.Put (Standard_Error, Seconds'Last);
+        Put      (Standard_Error, " seconds (");
+        Seconds_IO.Put (Standard_Error, Seconds'Last / 86_400.0);
+        Put_Line (Standard_Error, " days).");
         Put_Line (Standard_Error, "      return codes must be in the range 0 .. 255");
-        Put_Line (Standard_Error, "      command is executed in a subshell: /bin/sh -c ""<command>""");
+        Put_Line (Standard_Error, "      command is executed in a subshell: /bin/sh -c ""command""");
         Set_Exit_Status (-1);
     end Help;
 
-    subtype Return_Code is Integer range 0 .. 255;
-    type Success_Codes is array (1 .. 16) of Return_Code;
-    subtype Seconds is Float;
-
-    package Float_IO is new Ada.Text_IO.Float_IO
-        (Num => Float);
-    package Int_IO is new Ada.Text_IO.Integer_IO
-        (Num => Integer);
-    Last : Positive;
-
-    Num_Retries : Natural   := 0;
-    Attempts    : Natural   := 0;
-    Backoff     : Seconds   := 1.0;
-    Max_Backoff : Seconds   := 0.0;
-    SC_Index    : Positive  := Success_Codes'First;
-    SC          : Success_Codes := (others => 0);
-
-begin
-    Float_IO.Default_Fore := 0;
-    Float_IO.Default_Aft := 3;
-    Float_IO.Default_Exp := 0;
-    Int_IO.Default_Width := 0;
-
+    procedure Parse_Options is
+    begin
     loop
         case Getopt ("h n: b: m: s:") is
             when 'n' =>
                 Num_Retries := Natural'Value (Parameter);
             when 'b' =>
-                Float_IO.Get (Parameter, Backoff, Last);
+                Seconds_IO.Get (Parameter, Backoff, Last);
             when 'm' =>
-                Float_IO.Get (Parameter, Max_Backoff, Last);
+                Seconds_IO.Get (Parameter, Max_Backoff, Last);
             when 's' =>
                 SC (SC_Index) := Return_Code'Value (Parameter);
                 SC_Index := SC_Index + 1;
@@ -87,6 +88,14 @@ begin
                 return;
         end case;
     end loop;
+    end Parse_Options;
+begin
+    Seconds_IO.Default_Fore := 0;
+    Seconds_IO.Default_Aft := 3;
+    Seconds_IO.Default_Exp := 0;
+    Integer_IO.Default_Width := 0;
+
+    Parse_Options;
 
     declare
         Command    : String := Get_Argument;
@@ -114,33 +123,31 @@ begin
 
             Attempts := Attempts + 1;
             Put (Standard_Error, "Attempt ");
-            Int_IO.Put (Standard_Error, Attempts);
+            Integer_IO.Put (Standard_Error, Attempts);
             if Num_Retries > 0 then
                 Put (Standard_Error, "/");
-                Int_IO.Put (Standard_Error, Num_Retries);
+                Integer_IO.Put (Standard_Error, Num_Retries);
             end if;
             Put (Standard_Error, " exited with status ");
-            Int_IO.Put (Standard_Error, RC);
+            Integer_IO.Put (Standard_Error, RC);
 
             if Num_Retries > 0 and Attempts = Num_Retries then
                 Put_Line (Standard_Error, ", retries exceeded.");
                 exit;
             else
+                if Max_Backoff /= 0.0 and Backoff > Max_Backoff then
+                    Backoff := Max_Backoff;
+                end if;
+
                 Put (Standard_Error, ", retrying after ");
-                Float_IO.Put (Standard_Error, Backoff);
+                Seconds_IO.Put (Standard_Error, Backoff);
                 Put_Line (Standard_Error, " seconds");
 
                 Next_Retry := Clock + Milliseconds (Integer (Backoff * 1_000.0));
                 delay until Next_Retry;
 
                 Backoff := Backoff * 2.0;
-                if Max_Backoff /= 0.0 and Backoff > Max_Backoff then
-                    Backoff := Max_Backoff;
-                end if;
             end if;
         end loop;
     end;
-exception
-    when E : others =>
-        Put_Line (Ada.Exceptions.Exception_Information (E));
 end Retry;
