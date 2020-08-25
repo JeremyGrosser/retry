@@ -42,6 +42,7 @@ procedure Retry is
     SC_Index    : Positive  := Success_Codes'First;
     SC          : Success_Codes := (others => 0);
     Last        : Positive;
+    Ok          : Boolean;
 
     procedure Help is
     begin
@@ -68,26 +69,28 @@ procedure Retry is
         Set_Exit_Status (-1);
     end Help;
 
-    procedure Parse_Options is
+    procedure Parse_Options (Success : out Boolean) is
     begin
-    loop
-        case Getopt ("h n: b: m: s:") is
-            when 'n' =>
-                Num_Retries := Natural'Value (Parameter);
-            when 'b' =>
-                Seconds_IO.Get (Parameter, Backoff, Last);
-            when 'm' =>
-                Seconds_IO.Get (Parameter, Max_Backoff, Last);
-            when 's' =>
-                SC (SC_Index) := Return_Code'Value (Parameter);
-                SC_Index := SC_Index + 1;
-            when ASCII.NUL =>
-                exit;
-            when others =>
-                Help;
-                return;
-        end case;
-    end loop;
+        Success := True;
+        loop
+            case Getopt ("h n: b: m: s:") is
+                when 'n' =>
+                    Num_Retries := Natural'Value (Parameter);
+                when 'b' =>
+                    Seconds_IO.Get (Parameter, Backoff, Last);
+                when 'm' =>
+                    Seconds_IO.Get (Parameter, Max_Backoff, Last);
+                when 's' =>
+                    SC (SC_Index) := Return_Code'Value (Parameter);
+                    SC_Index := SC_Index + 1;
+                when ASCII.NUL =>
+                    exit;
+                when others =>
+                    Help;
+                    Success := False;
+                    return;
+            end case;
+        end loop;
     end Parse_Options;
 begin
     Seconds_IO.Default_Fore := 0;
@@ -95,7 +98,10 @@ begin
     Seconds_IO.Default_Exp := 0;
     Integer_IO.Default_Width := 0;
 
-    Parse_Options;
+    Parse_Options (Ok);
+    if Ok /= True then
+        return;
+    end if;
 
     declare
         Command    : String := Get_Argument;
