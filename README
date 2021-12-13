@@ -18,9 +18,10 @@ Usage
              default: 0
           -h this help
           
-          backoff values have a resolution of 1 millisecond (0.001 seconds)
+          backoff values have a resolution of 1 millisecond (0.001 seconds), 
+          up to 2147483.750 seconds (24.855 days).
           return codes must be in the range 0 .. 255
-          command is executed in a subshell: /bin/sh -c "<command>"
+          command is executed in a subshell: /bin/sh -c "command"
 
 Building
 ========
