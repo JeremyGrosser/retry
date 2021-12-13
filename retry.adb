@@ -1,6 +1,6 @@
 --------------------------------------------------------------------------------
 --  retry: run a command until it succeeds
---  Copyright (C) 2020 Jeremy Grosser <jeremy@synack.me>
+--  Copyright (C) 2020-2021 Jeremy Grosser <jeremy@synack.me>
 --
 --  This program is free software; you can redistribute it and/or
 --  modify it under the terms of the GNU General Public License
